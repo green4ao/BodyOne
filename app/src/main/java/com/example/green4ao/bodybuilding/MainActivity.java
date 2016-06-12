@@ -3,6 +3,10 @@ package com.example.green4ao.bodybuilding;
 import android.app.ProgressDialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -17,10 +21,12 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -124,6 +130,8 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+
     /**
      * A placeholder fragment containing a simple view.
      */
@@ -175,13 +183,44 @@ public class MainActivity extends AppCompatActivity {
             return rootView;
         }
 
+        @Override
+        public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+            super.onActivityCreated(savedInstanceState);
+            final Bitmap bitmap = ((BitmapDrawable)mImageView.getDrawable()).getBitmap();
+            mImageView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    int action = event.getAction();
+                    Matrix inverse = new Matrix();
+                    ((ImageView) v).getImageMatrix().invert(inverse);
+                    float[] touchPoint = new float[] {event.getX(), event.getY()};
+                    inverse.mapPoints(touchPoint);
+                    int x = 0;
+                    int y = 0;
+                    switch(action){
+                        case MotionEvent.ACTION_DOWN:
+                            x = Integer.valueOf((int)touchPoint[0]);
+                            y = Integer.valueOf((int)touchPoint[1]);
+                            break;
+                    }
+
+                    int pixel = bitmap.getPixel(x,y);
+
+                    //then do what you want with the pixel data, e.g
+                    int redValue = Color.red(pixel);
+                    int blueValue = Color.blue(pixel);
+                    int greenValue = Color.green(pixel);
+                    Toast.makeText(getActivity(),"R:"+redValue+" G:"+greenValue+" B:"+blueValue,Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+            });
+        }
+
         public void setImageList(Integer integer) {
             this.itemData = integer;
         }
 
-        /*
-            Picasso or simple BitMap???
-         */
+
         private void setImageOnViewPager(){
             try {
                 //if image size is too large. Need to scale as below code.
@@ -201,6 +240,7 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         if (mImageView != null) {
                             mImageView.setImageBitmap(myBitmap);
+
                         }
                     } catch (Exception e) {
                         e.printStackTrace();

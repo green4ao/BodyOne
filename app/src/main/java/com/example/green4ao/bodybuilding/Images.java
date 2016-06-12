@@ -9,8 +9,9 @@ public class Images {
     private ArrayList<Integer> imageIds;
     public Images(){
         imageIds = new ArrayList<>();
-        imageIds.add(R.drawable.front_body);
-        imageIds.add(R.drawable.back_body);
+        imageIds.add(R.mipmap.img_one);
+        imageIds.add(R.mipmap.img_two);
+
 
     }
 
